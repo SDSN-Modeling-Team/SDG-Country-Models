@@ -1,4 +1,4 @@
-# SDG-GAMS-modeling
+# SDG-Country-Models
 August 25, 2017
 
 This repository will contain the GAMS code for the SDG model at SDSN.
