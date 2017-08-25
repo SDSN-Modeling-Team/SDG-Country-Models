@@ -1,6 +1,14 @@
 $ontext
-Update: August 8, 2017
-This is the latest version of the US SDG model developed by Prof. Sachs
+Update: August 25, 2017
+This is the latest version of the US SDG model developed by Prof. Sachs.
+
+So far, this model includes:
+1. Basic core economic model
+2. Population dynamics
+3. Basic Education dynamics
+
+Following steps are:
+1. Include the 
 
 
 $offtext
