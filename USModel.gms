@@ -8,12 +8,13 @@ So far, this model includes:
 3. Basic Education dynamics
 
 Following steps are:
-1. Include the 
-
-
+1. Include international trade and develop government
+2. Include more sophistication in the education module
 $offtext
 
-*US SDG Model
+************
+* Settings *
+************
 
 Sets t /2015,2020,2025,2030,2035,2040,2045,2050/
          tstart(t)
