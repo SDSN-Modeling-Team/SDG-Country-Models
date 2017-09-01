@@ -1,6 +1,9 @@
 $title US SDG Model
-$subtitle Sustainable Development Solutions Network
-$subtitle Last Updated: August 31, 2017
+$stitle Sustainable Development Solutions Network
+$stitle Last Updated: September 1, 2017
+
+
+
 
 ************
 * Settings *
@@ -17,7 +20,7 @@ $offtext
 Sets     t       Time
                  tstart(t)       First Period
                  tend(t)         Last Period
-                 time(t)         Test period
+                 time(t)         Test Periods
          g       Gender
          i       Generation
                  wa(i)           Working Age
@@ -61,7 +64,7 @@ Alias    (s1,salias1)
 * The next list of parameters comes from the GDX file:
 
 Parameter        EducTarget(ed)                  SDG Education Target
-                 Lprod(ed)                      Initial Productivity by Ed Level
+                 Lprod0(ed)                      Initial Productivity by Ed Level
                  Pop0(i,g)                       Initial Population
                  Surv(t,i,g)                     Survival Rate
                  Educ0(i,g,ed)                   Initial Education Attainment
@@ -85,11 +88,11 @@ Parameter        EducTarget(ed)                  SDG Education Target
 * GDX Declaration
 *****************
 
-$CALL GDXXRW usagdx.xlsx Index=Index!a1 trace=0
+*$CALL GDXXRW usagdx.xlsx Index=Index!a1 trace=0
 $GDXIN usagdx.gdx
 $LOAD  t=S1 g=S2 i=S3 occ=S4 s=S5 ed=S6 iter=S7
 $LOAD  Pop0=D1 Surv=D2 FERT=D3 birthgender=D4 Educ0=D5 EducTarget=D6
-$LOAD  Lprod=D7 EduOcc=D8 Computer=D9 EmployOcc=D10 IO=D11 aL=D12
+$LOAD  Lprod0=D7 EduOcc=D8 Computer=D9 EmployOcc=D10 IO=D11 aL=D12
 $LOAD  MPCw=D13 MPCa=D14 DIRREQ=D15 VADR=D16 msh=D17 INsh=D18
 $LOAD  csh=D19 Ksh=D20 YLesh=D21
 $GDXIN
@@ -129,7 +132,7 @@ workage(i)$(ord(i) ge 14) = 0;
 oldage(i)$(ord(i) le 13) = 0;
 oldage(i)$(ord(i) ge 14) = 1;
 
-Lprodt(t,ed) = Lprod(ed);
+Lprodt(t,ed) = Lprod0(ed);
 Lprodt(t,ed)$(ord(ed) ge 5) = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
 
 ***********************
@@ -143,7 +146,7 @@ Parameter        Population(t,i,g)       Population by gender and generation at 
                  Births(t,g)             Total Births by gender at time t
                  Populationtotal(t)      Total Population at time t
                  Pop(t,g)                Total population by gender at time t
-                 Poptotal                Population Total in 2015;
+                 Poptotal                Population Total updated each loop of t;
 
 * Dynamics
 **********
@@ -172,7 +175,7 @@ Display Population, Births, Populationtotal;
 Parameter        EducPop(t,i,ed,g)    Population in each Educ Level
                  EducRatio(t,i,ed,g)  % of Population at each Educ Level
                  Ltot(t,ed)           Labor Force by Education Level
-                 LbyAge(t,i,ed)        Labor Force by Educ Level and Generation;
+                 LbyAge(t,i,ed)       Labor Force by Educ Level and Generation;
 * Dynamics
 **********
 
@@ -204,11 +207,11 @@ Parameter        PSchoolt(t)    Primary School Population
                  USSchoolt(t)   Upper Secondary Population
                  LTSchoolt(t)   Lower Tertiary Population
                  UTSchoolt(t)   Upper Tertiary Population
-                 PSchool        PS Initial Value
-                 LSSchool       LS Initial Value
-                 USSchool       US Initial Value
-                 LTSchool       LT Initial Value
-                 UTSchool       UT Initial Value;
+                 PSchool0        PS Initial Value
+                 LSSchool0       LS Initial Value
+                 USSchool0       US Initial Value
+                 LTSchool0       LT Initial Value
+                 UTSchool0       UT Initial Value;
 
 PSchoolt(t)  = sum(g,Population(t,"5-9",g));
 LSSchoolt(t) = sum(g,Population(t,"10-14",g));
@@ -223,27 +226,19 @@ UTSchoolt(t) = sum(g,Population(t,"25-29",g))*.20;
 * Parameter and Scalar Declaration
 **********************************
 
-parameter        rg(t)
-                 AI(s,ed)        Artificial Intellingence
-                 Letot(ed)
-                 Letotal(t,ed)
-                 Ltie(t,i,ed)
-                 Lie(i,ed)
-                 MPCWe(i)
-                 MPCAs(i);
+parameter        Letot(ed)      Initial Working Age Population at each Education Level
+                 Letotal(t,ed)  Letot in each time period
+                 Ltie(t,i,ed)   WA Pop at each educ and generation in each time period
+                 Lie(i,ed)      Initial Value for Ltie
+                 MPCWe(i)       Alternative MPC from wage
+                 MPCAs(i)       Alternative MPC from asset;
 
 Scalar   dep             Depreciation Rate of Capital
-         Db
-         disc            Discount Rate
-         VAT             Value-Added Tax;
+         disc            Discount Rate;
 
 dep = 0.05;
-Db = 0;
 disc = 1/(1+.13);
-VAT = 0;
 
-rg(t) = 0.1;
-AI(s,ed) = 0;
 Letotal(t,ed) = sum(wa,sum(g,EducPop(t,wa,ed,g)));
 Ltie(t,wa,ed) = sum(g, EducPop(t,wa,ed,g));
 
@@ -252,69 +247,64 @@ MPCWe(i)$((ord(i) gt 5) and (ord(i) lt 14)) = (1-disc**(14-ord(i)))/(1-disc**(18
 MPCAs(i) = 0;
 MPCAs(i)$((ord(i) gt 5) and (ord(i) lt 18)) = (1-disc)/(1-disc**(18-ord(i)));
 
+$ontext
+The Marginal Propensity used in the consumption equation is not the one derived
+from the model, but the one constructed in this section. Is this a placeholder?
+$offtext
+
 Positive Variables
 
-Qs(s)
-Cs(s)
-Gs(s)
-Con
-Con1                                                                                                                                                                   7
-CONie(i,ed)
-Conie1(i,ed)
-INV              Investment Good Quantity
-Is(s)
+Qs(s)            Sector Output
+Cs(s)            Sector Consumption
+Con              Total Private Consumption
+Con1             Total Consumption                                                                                                                                                      7
+CONie(i,ed)      Consumption by educ level and generation
+INV              Total Investment Quantity
+Is(s)            Investment by Sector (Quantity)
 PI               Investment Good Price
-Lse(s,ed)
+Lse(s,ed)        Labor demand by educ level and sector
 EFFL(s)          Effective Labor
-Ms(s)
-Rse(s,ed)
-Rs(s)
-Rob
-Mac
-Pc(s)
-Ps(s)
-We(s,ed)
-rrate(s)
-rrob(s,ed)
-GDP
-GNP
-GNP1
-Sie(i,ed)
-YLie(i,ed)
-YKie(i,ed)
-YL
-YLalt
-YK
-Lincome
-KN
-KNtest
-KNie(i,ed)
-Sub(s)
+Ms(s)            Machine demand by sector
+Rse(s,ed)        Robots demand by sector and education
+Rob              Total robot demand
+Mac              Total machine demand
+Ps(s)            Price of production good by sector
+We(s,ed)         Wage by sector and education level
+rrate(s)         Rate of return of machines
+rrob(s,ed)       Rate of return olf robots by type of robot (educ levels)
+GDP              Gross Domestic Product
+GNP              Gross National Product
+YLie(i,ed)       After Tax Labor Income by educ level and generation
+YKie(i,ed)       Capital Income by educ level and generation
+YL               Total Labor Income
+YK               Total Capital Income
+KN               Next Period Capital Stock
+KNtest           Next Period Capital Stock Check
+KNie(i,ed)       Next Period Capital Stock by generation and educ level
 GovC             Government Consumption
-Tx
-Wtax ;
+Tx               Total Tax Revenue
+Wtax             Labor Income Tax Rate;
 
 Variables
 
-INV1
-Sav
-Aie(i,ed)
-Util
-DbN;
+INV1             Total Investment Check from GDP equation
+Sav              Private Savings
+Aie(i,ed)        Assets by generation and educ level
+Util             Utility Function;
 
 ** Cost Structures
 
-Parameters cps,cls,cus,clt,cut,chl,cgov;
+Parameters cps,cls,cus,clt,cut,chl,cgov Per capita costs of government services;
 
-cps = .05;
-cls = .05;
-cus = .05;
-clt = .05;
-cut = .05;
-chl = .05;
+cps  = .05;
+cls  = .05;
+cus  = .05;
+clt  = .05;
+cut  = .05;
+chl  = .05;
 cgov = .05;
 
-Parameter rho;
+Parameter rho Elasticity parameter of substitution between robots and human labor;
 
 rho =-0.5;
 
@@ -325,34 +315,38 @@ Ktot0 = 500000;
 Ktot = 500000;
 Parameter Kie(i,ed);
 Ksh("85-89") = 0;
+
 Kie(i,ed) = Ktot*Ksh(i)*YLesh(ed);
 Letot(ed) = Letotal("2015",ed);
 Lie(wa,ed) = sum(g,EducPop("2015",wa,ed,g));
-PSchool = PSchoolt("2015");
-LSSchool = LSSchoolt("2015");
-USSchool = USSchoolt("2015");
-LTSchool = LTSchoolt("2015");
-UTSchool = UTSchoolt("2015");
-Parameter AI(s,ed),AIs(s,ed)AI with respect to time;
+PSchool0 = PSchoolt("2015");
+LSSchool0 = LSSchoolt("2015");
+USSchool0 = USSchoolt("2015");
+LTSchool0 = LTSchoolt("2015");
+UTSchool0 = UTSchoolt("2015");
+
+Parameter        AI(s,ed)        Initial Condition for AI
+                 AIs(s,ed)
+                 AIt(t);
 AI(s1,ed) = 0;
 AI(s1,lowed) = 0.5;
 AI(s1,meded) = 1.0;
 AIs(s,ed) = AI(s,ed);
-Parameter AIt(t);
 AIt(t) = 2*ord(t);
+
 Parameter Itot Total Investment;
 Itot = 747009;
 
 Equations
 
-Output(s)
-Demand(s)
-InvPrice
-InvestGood
-SecInvest(s)
-Robot
-Machine
-Capital
+Output(s)                Output by Sector
+Demand(s)                Demand (Consumption + Investment) by Sector
+InvPrice                 Price of Investment Good
+InvestGood               Investment Good Quantity
+SecInvest(s)             Investment Quantity by Sector
+Robot                    Robots employed by sector and skill level
+Machine                  Machine capital employed by sector
+Capital                  Total capital employed
 Labor(ed)
 Numeraire(s)
 Price(s)
@@ -396,10 +390,10 @@ Capital..               Mac + Rob =e= Ktot ;
 Labor(ed)..             sum(s1,Lse(s1,ed)) =e= Letot(ed);
 Numeraire("MAN")..      Ps("MAN") =e= 1;
 Price(nmar)..           Ps(nmar)*Qs(nmar) =e= sum(ed,We("MAN",ed)*Lse(nmar,ed))+rrate("MAN")*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
-Wage(s1,ed)..           We(s1,ed) =e= Lprod(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)*(EFFL(s1)/(Lprod(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
+Wage(s1,ed)..           We(s1,ed) =e= Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)*(EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 Irate(s1)..             rrate(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
-EffectiveLabor(s1)..    EFFL(s1) =e= (sum(ed,(Lprod(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed))**(-rho)))**(-1/rho);
-Iraterob(s1,ed)..       rrob(s1,ed) =e= AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)*(EFFL(s1)/(Lprod(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
+EffectiveLabor(s1)..    EFFL(s1) =e= (sum(ed,(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed))**(-rho)))**(-1/rho);
+Iraterob(s1,ed)..       rrob(s1,ed) =e= AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)*(EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 NationalOutput..        GDP =e= sum(s1,Ps(s1)*Qs(s1));
 KNext..                 KN =e= (1-dep)*Ktot + Itot;
 LabY(wa,ed)..           YLie(wa,ed) =e= We("MAN",ed)*Lie(wa,ed)*(1-Wtax);
@@ -420,7 +414,7 @@ KNbyAge(i+1,ed)..       KNie(i+1,ed) =e= Kie(i,ed)*(1-dep)+(YLie(i,ed)+YKie(i,ed
 KNbyAge1("25-29",ed)..  KNie("25-29",ed) =e= 0;
 PrivSav..               Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)));
 KNextTest..             KNtest =e= sum(adult,sum(ed,KNie(adult,ed)));
-GovEduc("Educ")..       Cs("Educ") =e= cps*(PSchool+cls*LSSchool+cus*USSchool+clt*LTSchool+cut*UTSchool);
+GovEduc("Educ")..       Cs("Educ") =e= cps*(PSchool0+cls*LSSchool0+cus*USSchool0+clt*LTSchool0+cut*UTSchool0);
 GovHealth("HL")..       Cs("HL") =e= chl*Poptotal;
 GovPublicAd("GOV")..    Cs("GOV") =e= cgov*Poptotal;
 Utility..               Util =e= sum(s1,Csh(s1)*log(Cs(s1)));
@@ -449,9 +443,10 @@ Parameter INV1t(t);
 Parameter Mact(t),Robt(t);
 
 Loop(time,
-  Lprod(ed) = Lprodt(time,ed);
+  Lprod0(ed) = Lprodt(time,ed);
   Letot(ed) = Letotal(time,ed);
   Lie(wa,ed) = Ltie(time,wa,ed);
+  Poptotal = PopulationTotal(time);
   Loop(iter,Solve USOLG maximizing Util using dnlp;
     Itot = INV1.L/PI.L;
   );
@@ -485,7 +480,7 @@ display Cont, Con1t;
 
 display Mact, Robt;
 
-display INVt,GovCt,Cont,GDPt;
+display INVt, INV1t,GovCt,Cont,GDPt;
 
 display GovCt,Txt;
 
