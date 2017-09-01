@@ -17,7 +17,7 @@ $offtext
 Sets     t       Time
                  tstart(t)       First Period
                  tend(t)         Last Period
-                 time(t)         Intermediate Periods
+                 time(t)         Test period
          g       Gender
          i       Generation
                  wa(i)           Working Age
