@@ -337,20 +337,20 @@ rho = -0.5;
 
 Equations
 
-Output(s)                Output by Sector
-Demand(s)                Demand (Consumption + Investment) by Sector
+PRODEQ1(s)               Output by Sector
+PRODEQ2(s)               Effective Labour
+
+MARKEQ1(s)               Demand (Consumption + Investment) by Sector
+MARKEQ2                  Total capital employed
+MARKEQ3(ed)              Labor employed by education level
+
 InvPrice                 Price of Investment Good
 InvestGood               Total Quantity of Investment Goods
 SecInvest(s)             Quantity of Investment by Sector
-Robot                    Robots employed
-Machine                  Machine capital employed
-Capital                  Total capital employed
-Labor(ed)                Labor employed by education level
 Numeraire(s)             price of manufacturing good
 Price(s)                 Price of non-market goods
 Wage(s,ed)               Wage by sector and education level
 MRs(s)                   Rate of Return on Machines
-EffectiveLabor(s)
 RRse(s,ed)               Rate of Return on Robots
 NationalOutput
 KNext                    Next period's initial capital stock
@@ -378,16 +378,13 @@ GovPublicAd(s)           Government Public Administration Expenditure
 Utility                  Total Utility;
 
 *Production Block
-Output(s1)..            Qs(s1) =e= EFFL(s1)**(1-msh(s1))*Ms(s1)**msh(s1);
-EffectiveLabor(s1)..    EFFL(s1) =e= (sum(ed,(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed))**(-rho)))**(-1/rho);
+PRODEQ1(s1)..           Qs(s1) =e= EFFL(s1)**(1-msh(s1))*Ms(s1)**msh(s1);
+PRODEQ2(s1)..           EFFL(s1) =e= (sum(ed,(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed))**(-rho)))**(-1/rho);
 
 *Market Clearing
-Demand(s1)..            Cs(s1)+Is(s1) =e= Qs(s1);
-Robot..                 Rob =e= sum(ed,sum(s1,Rse(s1,ed))) ;
-Machine..               Mac =e= sum(s1,Ms(s1));
-Capital..               Mac + Rob =e= Ktot ;
-*These three equations can be condensed to one
-Labor(ed)..             sum(s1,Lse(s1,ed)) =e= Letot(ed);
+MARKEQ1(s1)..           Cs(s1)+Is(s1) =e= Qs(s1);
+MARKEQ2..               KTOT =e= sum(ed,sum(s1,Rse(s1,ed))) + sum(s1,Ms(s1));
+MARKEQ3(ed)..           sum(s1,Lse(s1,ed)) =e= Letot(ed);
 
 *Factor Markets
 
