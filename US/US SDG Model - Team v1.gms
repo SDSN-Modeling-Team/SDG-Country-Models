@@ -280,7 +280,8 @@ Mac              Total machine demand
 Ps(s)            Price of production good by sector
 We(s,ed)         Wage by sector and education level
 MRs(s)           Rate of return of machines
-RRs(s,ed)        Rate of return olf robots by type of robot (educ levels)
+RRse(s,ed)       Rate of return of robots by type of robot (educ levels)
+IRse(s,ed)       Average rate of return for capital
 GDP              Gross Domestic Product
 GNP              Gross National Product
 YLie(i,ed)       After Tax Labor Income by educ level and generation
@@ -298,8 +299,9 @@ Variables
 
 INV1             Total Investment Check from GDP equation
 Sav              Private Savings
-Assets(i,ed)     Assets by generation and educ level
+Aie(i,ed)        Assets by generation and educ level
 Util             Utility Function;
+
 
 *Model Equations
 ****************
@@ -324,6 +326,7 @@ PRICEQ2(s)               Price of non-market goods
 FACTEQ1(s,ed)            Wage by sector and education level
 FACTEQ2(s)               Rate of Return on Machines
 FACTEQ3(s,ed)            Rate of Return on Robots
+FACTEQ4(s,ed)            Average Rate of Return
 
 NATEQ1                   Calculation of GDP by summing sectors
 NATEQ2(i,ed)             Capital income by generation and education level
@@ -366,6 +369,7 @@ MARKEQ3(ed)..           sum(s1,Lse(s1,ed)) =e= Letot(ed);
 FACTEQ1(s1,ed)..        We(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 FACTEQ2(s1)..           MRs(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
 FACTEQ3(s1,ed)..        RRse(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
+FACTEQ4(s1,ed)          IRse(s,ed) =e= (MRs(s) * sum(s,(Ms(s))) + RRse(s,ed) * sum(s,(Rse(s,ed))) / sum(s,(Ms(s) + Rse(s,ed)));
 
 *Investment / Savings Sector [Financial Markets]
 INVEQ1..                INV =e= Itot*PI;
@@ -378,10 +382,9 @@ INVEQ4..                KN =e= (1-dep)*Ktot + Itot;
 *including INV/PI  instead of Itot.
 
 *Savings
-*rrate is incorrect; should be total return or weighted return between machines, robots
-SAVEQ1(adult,ed)..      Assets(adult,ed) =e= (1+rrate(manu))*Kie(adult,ed);
+SAVEQ1(adult,ed)..      Aie(adult,ed) =e= (1+IRse(manu))*Kie(adult,ed);
 SAVEQ2(wa,ed)..         YLie(wa,ed) =e= We(manu,ed)*Lie(wa,ed)*(1-Wtax);
-SAVEQ3(adult,ed)..      CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Assets(adult,ed) ;
+SAVEQ3(adult,ed)..      CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Aie(adult,ed) ;
 SAVEQ4..                Con1 =e= sum(adult,sum(ed,CONie(adult,ed)));
 SAVEQ5..                GDP =e= Con1 + GovC + INV1;
 *Savings should = INV1, so this is a test equation?
@@ -389,8 +392,7 @@ SAVEQ6..                Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)))
 
 *Prices
 PRICEQ1(manu)..          Ps(manu) =e= 1;
-*rrate is incorrect; should be total return or weighted return between machines, robots
-PRICEQ2(nmar)..          Ps(nmar)*Qs(nmar) =e= sum(ed,We(manu,ed)*Lse(nmar,ed))+rrate(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
+PRICEQ2(nmar)..          Ps(nmar)*Qs(nmar) =e= sum(ed,We(manu,ed)*Lse(nmar,ed))+IRse(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
 
 *National Accounts
 NATEQ1..                GDP =e= sum(s1,Ps(s1)*Qs(s1));
@@ -398,7 +400,7 @@ NATEQ1..                GDP =e= sum(s1,Ps(s1)*Qs(s1));
 NATEQ2(adult,ed)..      YKie(adult,ed) =e= rrate(manu)*Kie(adult,ed);
 NATEQ3..                YL =e= sum(ed,We(manu,ed)*Letot(ed));
 *rrate is incorrect; should be total return or weighted return between machines, robots
-NATEQ4..                YK =e= rrate(manu)*Ktot;
+NATEQ4..                YK =e= IRse(manu)*Ktot;
 NATEQ5..                GNP =e= YL + YK;
 *Irrelevant variable
 NATEQ6..                Con =e= sum(mar,Ps(mar)*Cs(mar));
