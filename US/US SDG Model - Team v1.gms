@@ -314,34 +314,38 @@ MARKEQ1(s)               Demand (Consumption + Investment) by Sector
 MARKEQ2                  Total capital employed
 MARKEQ3(ed)              Labor employed by education level
 
-InvPrice                 Price of Investment Good
-InvestGood               Total Quantity of Investment Goods
-SecInvest(s)             Quantity of Investment by Sector
+INVEQ1                   Total Quantity of Investment Goods
+INVEQ2                   Price of Investment Good
+INVEQ3(s)                Quantity of Investment by Sector
+INVEQ4                   Next period's initial capital stock
 Numeraire(s)             price of manufacturing good
 Price(s)                 Price of non-market goods
-Wage(s,ed)               Wage by sector and education level
-MRs(s)                   Rate of Return on Machines
-RRse(s,ed)               Rate of Return on Robots
-NationalOutput
-KNext                    Next period's initial capital stock
-LabY(i,ed)               Labor income by generation and education level
-CapY(i,ed)               Capital income by generation and education level
-AssetY(i,ed)             Stock of capital assets by generation and education level
-Consume(i,ed)            Level of consumption by generation and education level
-LaborIncome              Total labor income
-CapitalIncome            Total capital income
-NationalIncome           Total capital and labor income
+
+FACTEQ1(s,ed)            Wage by sector and education level
+FACTEQ2(s)               Rate of Return on Machines
+FACTEQ3(s,ed)            Rate of Return on Robots
+
+NATEQ1                   Calculation of GDP by summing sectors
+NATEQ2(i,ed)             Capital income by generation and education level
+NATEQ3                   Total labor income
+NATEQ4                   Total capital income
+NATEQ5                   Total capital and labor income
+NATEQ6                   Total expenditure on market goods
+NATEQ7(s)                Demand for market sector goods
+
+SAVEQ1(i,ed)             Stock of capital assets by generation and education level
+SAVEQ2(i,ed)             Labor income by generation and education level
+SAVEQ3(i,ed)             Level of consumption by generation and education level
+SAVEQ4                   total household consumption (test)
+SAVEQ5                   C + I + G GDP Calculation
+SAVEQ6                   Total private Saving
+
 Government               Total gov't expenditure on non-market goods
 BalBudget                Balance Government expenditure with tax revenue
 Wtaxrate                 Labor income tax rate
-CONtotal                 total household consumption (test)
-PrivCon                  total expenditure on market goods
-SECDemand(s)             Demand for market sector goods
-AGDemand                 GDP Expenditure
 KNbyAge(i,ed)            Capital ownership in next period
 KNbyAge1(i,ed)           Capital ownership of generation entering workforce = 0
 KNextTest                sum of all generations' assets
-PrivSav                  Total private Saving
 GovEduc(s)               Government Education Expenditure
 GovHealth(s)             Government Health Expenditure
 GovPublicAd(s)           Government Public Administration Expenditure
@@ -357,16 +361,15 @@ MARKEQ2..               KTOT =e= sum(ed,sum(s1,Rse(s1,ed))) + sum(s1,Ms(s1));
 MARKEQ3(ed)..           sum(s1,Lse(s1,ed)) =e= Letot(ed);
 
 *Factor Markets
-
-Wage(s1,ed)..           We(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
-MRs(s1)..               MRs(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
-RRse(s1,ed)..           RRse(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
+FACTEQ1(s1,ed)..        We(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
+FACTEQ2(s1)..           MRs(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
+FACTEQ3(s1,ed)..        RRse(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 
 *Investment / Savings Sector [Financial Markets]
-InvestGood..            INV =e= Itot*PI;
-InvPrice..              PI =e= sum(s1,INsh(s1)*Ps(s1));
-SecInvest(s1)..         Is(s1) =e= (INV/PI)*INsh(s1);
-KNext..                 KN =e= (1-dep)*Ktot + Itot;
+INVEQ1..                INV =e= Itot*PI;
+INVEQ2..                PI =e= sum(s1,INsh(s1)*Ps(s1));
+INVEQ3(s1)..            Is(s1) =e= (INV/PI)*INsh(s1);
+INVEQ4..                KN =e= (1-dep)*Ktot + Itot;
 *Investment dynamic seems incorrect. Savings today (AGDemand) are transformed into
 *investments tomorrow, which are transformed into capital the period after that.
 *The proposed change has InvestGood eliminated, INV1 renamed INV, and Knext
@@ -374,13 +377,13 @@ KNext..                 KN =e= (1-dep)*Ktot + Itot;
 
 *Savings
 *rrate is incorrect; should be total return or weighted return between machines, robots
-AssetY(adult,ed)..      Aie(adult,ed) =e= (1+rrate(manu))*Kie(adult,ed);
-LabY(wa,ed)..           YLie(wa,ed) =e= We(manu,ed)*Lie(wa,ed)*(1-Wtax);
-Consume(adult,ed)..     CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Aie(adult,ed) ;
-CONtotal..              Con1 =e= sum(adult,sum(ed,CONie(adult,ed)));
-AGDemand..              GDP =e= Con1 + GovC + INV1;
+SAVEQ1(adult,ed)..      Aie(adult,ed) =e= (1+rrate(manu))*Kie(adult,ed);
+SAVEQ2(wa,ed)..         YLie(wa,ed) =e= We(manu,ed)*Lie(wa,ed)*(1-Wtax);
+SAVEQ3(adult,ed)..      CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Aie(adult,ed) ;
+SAVEQ4..                Con1 =e= sum(adult,sum(ed,CONie(adult,ed)));
+SAVEQ5..                GDP =e= Con1 + GovC + INV1;
 *Savings should = INV1, so this is a test equation?
-PrivSav..               Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)));
+SAVEQ6..                Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)));
 
 *Prices
 Numeraire(manu)..      Ps(manu) =e= 1;
@@ -388,17 +391,17 @@ Numeraire(manu)..      Ps(manu) =e= 1;
 Price(nmar)..           Ps(nmar)*Qs(nmar) =e= sum(ed,We(manu,ed)*Lse(nmar,ed))+rrate(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
 
 *National Accounts
-NationalOutput..        GDP =e= sum(s1,Ps(s1)*Qs(s1));
+NATEQ1..                GDP =e= sum(s1,Ps(s1)*Qs(s1));
 *rrate is incorrect; should be total return or weighted return between machines, robots
-CapY(adult,ed)..        YKie(adult,ed) =e= rrate(manu)*Kie(adult,ed);
-LaborIncome..           YL =e= sum(ed,We(manu,ed)*Letot(ed));
+NATEQ2(adult,ed)..      YKie(adult,ed) =e= rrate(manu)*Kie(adult,ed);
+NATEQ3..                YL =e= sum(ed,We(manu,ed)*Letot(ed));
 *rrate is incorrect; should be total return or weighted return between machines, robots
-CapitalIncome..         YK =e= rrate(manu)*Ktot;
-NationalIncome..        GNP =e= YL + YK;
+NATEQ4..                YK =e= rrate(manu)*Ktot;
+NATEQ5..                GNP =e= YL + YK;
 *Irrelevant variable
-PrivCon..               Con =e= sum(mar,Ps(mar)*Cs(mar));
+NATEQ6..                Con =e= sum(mar,Ps(mar)*Cs(mar));
 *Product of first order condition of utility problem
-SECDemand(mar)..        Cs(mar) =e= Csh(mar)*Cs(manu)/(Csh(manu)*Ps(mar));
+NATEQ7(mar)..           Cs(mar) =e= Csh(mar)*Cs(manu)/(Csh(manu)*Ps(mar));
 
 *Government
 GovEduc("Educ")..       Cs("Educ") =e= cps*(PSchool0+cls*LSSchool0+cus*USSchool0+clt*LTSchool0+cut*UTSchool0);
