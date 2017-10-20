@@ -234,6 +234,17 @@ The Marginal Propensity used in the consumption equation is not the one derived
 from the model, but the one constructed in this section. Is this a placeholder?
 $offtext
 
+*Cost Structures
+****************
+
+cps  = .05;
+cls  = .05;
+cus  = .05;
+clt  = .05;
+cut  = .05;
+chl  = .05;
+cgov = .05;
+
 *Initial Conditions (2015)
 **************************
 
@@ -295,17 +306,6 @@ INV1             Total Investment Check from GDP equation
 Sav              Private Savings
 Aie(i,ed)        Assets by generation and educ level
 Util             Utility Function;
-
-*Cost Structures
-****************
-
-cps  = .05;
-cls  = .05;
-cus  = .05;
-clt  = .05;
-cut  = .05;
-chl  = .05;
-cgov = .05;
 
 *Model Equations
 ****************
