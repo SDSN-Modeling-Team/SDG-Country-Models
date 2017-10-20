@@ -284,7 +284,7 @@ RRse(s,ed)       Rate of return of robots by type of robot (educ levels)
 IRse(s,ed)       Average rate of return for capital
 GDP              Gross Domestic Product
 GNP              Gross National Product
-YLie(i,ed)       After Tax Labor Income by educ level and generation
+YLie(i,ed)       Net Labor Income by educ level and generation (after tax)
 YKie(i,ed)       Capital Income by educ level and generation
 YL               Total Labor Income
 YK               Total Capital Income
