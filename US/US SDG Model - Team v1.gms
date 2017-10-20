@@ -26,11 +26,6 @@ Sets     t                       Time
          occ                     Occupations
          s                       Sectors
                  s1(s)           all but self and total
-$ontext
-Why have an exogenous "sector" called total if we can just calculate it within the model?  
-Why have a sector called "self-employment"? 
-If we got rid of these, we would be able to run equations just by calling the full set of sectors, instead of calling subsets.
-$offtext
                  mar(s)          market sectors (all but EDUC HL GOV SLF TOT)
                  nmar(s)         non-market sectors (EDUC HL GOV SLF TOT)
                  tr(s)           internationally tradable
@@ -97,7 +92,7 @@ old(i)     = yes$((ord(i) ge 14) and (ord(i) le 17));
 
 s1(s)      = yes$(ord(s) lt 19);
 mar(s)     = yes$(ord(s) lt 13 or (ord(s) ge 15 and ord(s) lt 18));
-nmar(s)    = yes$((ord(s) eq 13) or (ord(s) eq 14) or (ord(s) eq 18))
+nmar(s)    = yes$((ord(s) eq 13) or (ord(s) eq 14) or (ord(s) eq 18));
 manu(s)    = yes$(ord(s) eq 5);
 
 lowed(ed)  = yes$(ord(ed) le 1);
