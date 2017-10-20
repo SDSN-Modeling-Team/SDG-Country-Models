@@ -131,24 +131,24 @@ Parameters       Population(t,i,g)       Population by gender and generation at 
                  MPCWe(i)                Alternative MPC from wage
                  MPCAs(i)                Alternative MPC from asset
                  AI(s,ed)                Initial Condition for AI
-                 AIs(s,ed)
-                 AIt(t)
-                 Kie(i,ed)
-                 cps                      Per Capita cost of primary education services
-                 cls                      Per Capita cost of lower secondary education services
-                 cus                      Per Capita cost of upper secondary education services
-                 clt                      Per Capita cost of lower tertiary education services
-                 cut                      Per capita cost of upper tertiary education services
-                 chl                      Per capita cost of health services
-                 cgov                     Per capita cost of government services
-                 rho                      Elasticity parameter of substitution between robots and human labor;
+                 AIs(s,ed)               AI productivity by sector and education level
+                 AIt(t)                  AI productivity rate of increase
+                 Kie(i,ed)               Capital income by age and education level
+                 cps                     Per Capita cost of primary education services
+                 cls                     Per Capita cost of lower secondary education services
+                 cus                     Per Capita cost of upper secondary education services
+                 clt                     Per Capita cost of lower tertiary education services
+                 cut                     Per capita cost of upper tertiary education services
+                 chl                     Per capita cost of health services
+                 cgov                    Per capita cost of government services
+                 rho                     Elasticity parameter of substitution between robots and human labor;
 
-Scalars          dep                      Depreciation Rate of Capital
-                 disc                     Discount Rate
-                 Ktot0                    Initial capital Stock
-                 Ktot                     Total capital Stock
+Scalars          dep                     Depreciation Rate of Capital
+                 disc                    Discount Rate
+                 Ktot0                   Initial capital Stock
+                 Ktot                    Total capital Stock
                  Itot;
-                 
+
 *Model Parameter Definitions
 ****************************
 
@@ -192,6 +192,7 @@ LbyAge(t,wa,ed)          = sum(g,EducPop(t,wa,ed,g));
 
 *Labor Productivity
 *******************
+Lprodt(t,ed)     = Lprod0(ed);
 Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
 
 * School Population
@@ -202,6 +203,17 @@ LSSchoolt(t) = sum(g,Population(t,"10-14",g));
 USSchoolt(t) = sum(g,Population(t,"15-19",g));
 LTSchoolt(t) = sum(g,Population(t,"20-24",g))*.55;
 UTSchoolt(t) = sum(g,Population(t,"25-29",g))*.20;
+
+*Cost Structures of Government Services
+***************************************
+
+cps  = .05;
+cls  = .05;
+cus  = .05;
+clt  = .05;
+cut  = .05;
+chl  = .05;
+cgov = .05;
 
 ***********************
 * Core Economic Model *
@@ -229,30 +241,17 @@ The Marginal Propensity used in the consumption equation is not the one derived
 from the model, but the one constructed in this section. Is this a placeholder?
 $offtext
 
-*Cost Structures
-****************
-
-cps  = .05;
-cls  = .05;
-cus  = .05;
-clt  = .05;
-cut  = .05;
-chl  = .05;
-cgov = .05;
-
-*Initial Conditions (2015)
-**************************
+*Starting Conditions (2015)
+***************************
 
 Ktot0    = 500000;
 Ktot     = 500000;
 Itot     = 747009;
 
-
 Ksh("85-89")     = 0;
 Kie(i,ed)        = Ktot*Ksh(i)*YLesh(ed);
 Letot(ed)        = Letotal("2015",ed);
 Lie(wa,ed)       = sum(g,EducPop("2015",wa,ed,g));
-Lprodt(t,ed)     = Lprod0(ed);
 PSchool0         = PSchoolt("2015");
 LSSchool0        = LSSchoolt("2015");
 USSchool0        = USSchoolt("2015");
