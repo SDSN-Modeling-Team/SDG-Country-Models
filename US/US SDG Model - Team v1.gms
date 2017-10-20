@@ -366,7 +366,7 @@ MARKEQ3(ed)..           sum(s1,Lse(s1,ed)) =e= Letot(ed);
 FACTEQ1(s1,ed)..        Wse(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 FACTEQ2(s1)..           MRs(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
 FACTEQ3(s1,ed)..        RRse(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
-FACTEQ4(s1,ed)          IRse(s1,ed) =e= (MRs(s1) * sum(s1,(Ms(s1))) + RRse(s1,ed) * sum(s1,sum(ed,(Rse(s1,ed)))) / sum(s1,(Ms(s1) + sum(ed,(Rse(s1,ed)))));
+FACTEQ4(s1,ed)..        IRse(s1,ed) =e= (MRs(s1) * sum(s1,(Ms(s1))) + RRse(s1,ed) * sum(s1,sum(ed,(Rse(s1,ed)))) / sum(s1,(Ms(s1) + sum(ed,(Rse(s1,ed)))));
 
 *Investment / Savings Sector [Financial Markets]
 INVEQ1..                INV =e= Itot*PI;
