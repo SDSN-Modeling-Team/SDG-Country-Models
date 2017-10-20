@@ -318,8 +318,9 @@ INVEQ1                   Total Quantity of Investment Goods
 INVEQ2                   Price of Investment Good
 INVEQ3(s)                Quantity of Investment by Sector
 INVEQ4                   Next period's initial capital stock
-Numeraire(s)             price of manufacturing good
-Price(s)                 Price of non-market goods
+
+PRICEQ1(s)               Price of manufacturing good
+PRICEQ2(s)               Price of non-market goods
 
 FACTEQ1(s,ed)            Wage by sector and education level
 FACTEQ2(s)               Rate of Return on Machines
@@ -340,15 +341,17 @@ SAVEQ4                   total household consumption (test)
 SAVEQ5                   C + I + G GDP Calculation
 SAVEQ6                   Total private Saving
 
-Government               Total gov't expenditure on non-market goods
-BalBudget                Balance Government expenditure with tax revenue
-Wtaxrate                 Labor income tax rate
 KNbyAge(i,ed)            Capital ownership in next period
 KNbyAge1(i,ed)           Capital ownership of generation entering workforce = 0
 KNextTest                sum of all generations' assets
-GovEduc(s)               Government Education Expenditure
-GovHealth(s)             Government Health Expenditure
-GovPublicAd(s)           Government Public Administration Expenditure
+
+GOVEQ1(s)                Government Education Expenditure
+GOVEQ2(s)                Government Health Expenditure
+GOVEQ3(s)                Government Public Administration Expenditure
+GOVEQ4                   Total gov't expenditure on non-market goods
+GOVEQ5                   Labor income tax rate
+GOVEQ6                   Balance Government expenditure with tax revenue
+
 Utility                  Total Utility;
 
 *Production Block
@@ -386,9 +389,9 @@ SAVEQ5..                GDP =e= Con1 + GovC + INV1;
 SAVEQ6..                Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)));
 
 *Prices
-Numeraire(manu)..      Ps(manu) =e= 1;
+PRICEQ1(manu)..          Ps(manu) =e= 1;
 *rrate is incorrect; should be total return or weighted return between machines, robots
-Price(nmar)..           Ps(nmar)*Qs(nmar) =e= sum(ed,We(manu,ed)*Lse(nmar,ed))+rrate(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
+PRICEQ2(nmar)..          Ps(nmar)*Qs(nmar) =e= sum(ed,We(manu,ed)*Lse(nmar,ed))+rrate(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
 
 *National Accounts
 NATEQ1..                GDP =e= sum(s1,Ps(s1)*Qs(s1));
@@ -404,12 +407,12 @@ NATEQ6..                Con =e= sum(mar,Ps(mar)*Cs(mar));
 NATEQ7(mar)..           Cs(mar) =e= Csh(mar)*Cs(manu)/(Csh(manu)*Ps(mar));
 
 *Government
-GovEduc("Educ")..       Cs("Educ") =e= cps*(PSchool0+cls*LSSchool0+cus*USSchool0+clt*LTSchool0+cut*UTSchool0);
-GovHealth("HL")..       Cs("HL") =e= chl*Poptotal;
-GovPublicAd("GOV")..    Cs("GOV") =e= cgov*Poptotal;
-Government..            sum(nmar,Ps(nmar)*Cs(nmar)) =e= GovC;
-Wtaxrate..              Tx =e= Wtax*YL;
-BalBudget..             Tx =e= GovC;
+GOVEQ1("Educ")..        Cs("Educ") =e= cps*(PSchool0+cls*LSSchool0+cus*USSchool0+clt*LTSchool0+cut*UTSchool0);
+GOVEQ2("HL")..          Cs("HL") =e= chl*Poptotal;
+GOVEQ3("GOV")..         Cs("GOV") =e= cgov*Poptotal;
+GOVEQ4..                sum(nmar,Ps(nmar)*Cs(nmar)) =e= GovC;
+GOVEQ5..                Tx =e= Wtax*YL;
+GOVEQ6..                Tx =e= GovC;
 
 *Test Equations
 
