@@ -201,8 +201,8 @@ Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
 PSchoolt(t)  = sum(g,Population(t,"5-9",g));
 LSSchoolt(t) = sum(g,Population(t,"10-14",g));
 USSchoolt(t) = sum(g,Population(t,"15-19",g));
-LTSchoolt(t) = sum(g,Population(t,"20-24",g))*.55;
-UTSchoolt(t) = sum(g,Population(t,"25-29",g))*.20;
+LTSchoolt(t) = sum(g,Population(t,"20-24",g))*sum(ed,yes$(ord(EducTarget) ge 3);
+UTSchoolt(t) = sum(g,Population(t,"25-29",g))*sum(ed,yes$(ord(EducTarget) ge 4);
 
 *Cost Structures of Government Services
 ***************************************
