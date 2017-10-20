@@ -296,8 +296,8 @@ Rob              Total robot demand
 Mac              Total machine demand
 Ps(s)            Price of production good by sector
 We(s,ed)         Wage by sector and education level
-rrate(s)         Rate of return of machines
-rrob(s,ed)       Rate of return olf robots by type of robot (educ levels)
+MRs(s)           Rate of return of machines
+RRs(s,ed)        Rate of return olf robots by type of robot (educ levels)
 GDP              Gross Domestic Product
 GNP              Gross National Product
 YLie(i,ed)       After Tax Labor Income by educ level and generation
@@ -349,9 +349,9 @@ Labor(ed)                Labor employed by education level
 Numeraire(s)             price of manufacturing good
 Price(s)                 Price of non-market goods
 Wage(s,ed)               Wage by sector and education level
-Irate(s)                 Rate of Return on Machines
+MRs(s)                   Rate of Return on Machines
 EffectiveLabor(s)
-Iraterob(s,ed)           Rate of Return on Robots
+RRse(s,ed)               Rate of Return on Robots
 NationalOutput
 KNext                    Next period's initial capital stock
 LabY(i,ed)               Labor income by generation and education level
@@ -392,10 +392,8 @@ Labor(ed)..             sum(s1,Lse(s1,ed)) =e= Letot(ed);
 *Factor Markets
 
 Wage(s1,ed)..           We(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
-*Name of Irate changed to MRs(interest rate of machines)
-Irate(s1)..             rrate(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
-*Iraterob name changed to RRs(interest rate of robots)
-Iraterob(s1,ed)..       rrob(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
+MRs(s1)..               MRs(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
+RRse(s1,ed)..           RRse(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 
 *Investment / Savings Sector [Financial Markets]
 InvestGood..            INV =e= Itot*PI;
