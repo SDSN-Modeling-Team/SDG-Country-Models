@@ -2,7 +2,6 @@ $title US SDG Model
 $stitle Sustainable Development Solutions Network
 $stitle Last Updated: October 20, 2017
 
-
 ************
 * Settings *
 ************
@@ -56,7 +55,7 @@ Sets     t       Time
 Alias    (s1,salias1)
          (ed,ed1);
 
-* Parameter Declaration
+* GDX Parameter Declaration
 ***********************
 
 * The next list of parameters comes from the GDX file:
@@ -83,8 +82,8 @@ Parameter        EducTarget(ed)                  SDG Education Target
                  Ksh(i)                          Wealth Distribution by Generation
                  YLesh(ed)                       Wealth Distribution by Educ Level;
 
-* GDX Declaration
-*****************
+* GDX Parameter Definition
+**************************
 
 *$CALL GDXXRW usagdx.xlsx Index=Index!a1 trace=0
 $GDXIN usagdx.gdx
@@ -118,25 +117,15 @@ lowed(ed)  = yes$(ord(ed) le 1);
 meded(ed)  = yes$(ord(ed) ge 2 and ord(ed) le 4);
 hied(ed)   = yes$(ord(ed) gt 4);
 
+
+* Model Parameter Declarations
+***********************
 *The next list of parameters are produced within the model:
 
-parameter        workage(i)                      Working Age Dummies
-                 oldage(i)                       Old Age Dummies
-                 Lprodt(t,ed)                    Lprod Time Based;
-
-workage(i)$(ord(i) le 5)                  = 0;
-workage(i)$(ord(i) gt 5 and ord(i) lt 14) = 1;
-workage(i)$(ord(i) ge 14)                 = 0;
-oldage(i)$(ord(i) le 13)                  = 0;
-oldage(i)$(ord(i) ge 14)                  = 1;
-
-Lprodt(t,ed)                     = Lprod0(ed);
-Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
-
-* Parameter Declarations
-***********************
-
-Parameters       Population(t,i,g)       Population by gender and generation at time t
+Parameters       workage(i)              Working Age Dummies
+                 oldage(i)               Old Age Dummies
+                 Lprodt(t,ed)            Lprod Time Based
+                 Population(t,i,g)       Population by gender and generation at time t
                  Births(t,g)             Total Births by gender at time t
                  Populationtotal(t)      Total Population at time t
                  Pop(t,g)                Total population by gender at time t
@@ -155,23 +144,42 @@ Parameters       Population(t,i,g)       Population by gender and generation at 
                  USSchool0               US Initial Value
                  LTSchool0               LT Initial Value
                  UTSchool0               UT Initial Value
-                 Letot(ed)      Initial Working Age Population at each Education Level
-                 Letotal(t,ed)  Letot in each time period
-                 Ltie(t,i,ed)   WA Pop at each educ and generation in each time period
-                 Lie(i,ed)      Initial Value for Ltie
-                 MPCWe(i)       Alternative MPC from wage
-                 MPCAs(i)       Alternative MPC from asset
-                 AI(s,ed)        Initial Condition for AI
+                 Letot(ed)               Initial Working Age Population at each Education Level
+                 Letotal(t,ed)           Letot in each time period
+                 Ltie(t,i,ed)            WA Pop at each educ and generation in each time period
+                 Lie(i,ed)               Initial Value for Ltie
+                 MPCWe(i)                Alternative MPC from wage
+                 MPCAs(i)                Alternative MPC from asset
+                 AI(s,ed)                Initial Condition for AI
                  AIs(s,ed)
                  AIt(t)
                  Kie(i,ed)
-                 cps,cls,cus,clt,cut,chl,cgov Per capita costs of government services
-                 rho Elasticity parameter of substitution between robots and human labor;
+                 cps                      Per Capita costs of education services
+                 cls
+                 cus
+                 clt
+                 cut                      Per capita costs of 
+                 chl                      Per capita costs of health services
+                 cgov                     Per capita costs of government services
+                 rho                      Elasticity parameter of substitution between robots and human labor;
+
+
+
+Lprodt(t,ed)                     = Lprod0(ed);
+Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
 
 
 ***********************
 * Population Dynamics *
 ***********************
+
+*Age group definition 
+workage(i)$(ord(i) le 5)                  = 0;
+workage(i)$(ord(i) gt 5 and ord(i) lt 14) = 1;
+workage(i)$(ord(i) ge 14)                 = 0;
+oldage(i)$(ord(i) le 13)                  = 0;
+oldage(i)$(ord(i) ge 14)                  = 1;
+
 
 Population("2015",i,g)    = Pop0(i,g);
 
@@ -321,12 +329,11 @@ cut  = .05;
 chl  = .05;
 cgov = .05;
 
-Parameter ;
 
 rho = -0.5;
 
-*Model Equation
-***************
+*Model Equations
+****************
 
 Equations
 
