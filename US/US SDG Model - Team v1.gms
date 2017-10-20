@@ -298,7 +298,7 @@ Variables
 
 INV1             Total Investment Check from GDP equation
 Sav              Private Savings
-Aie(i,ed)        Assets by generation and educ level
+Assets(i,ed)     Assets by generation and educ level
 Util             Utility Function;
 
 *Model Equations
@@ -379,9 +379,9 @@ INVEQ4..                KN =e= (1-dep)*Ktot + Itot;
 
 *Savings
 *rrate is incorrect; should be total return or weighted return between machines, robots
-SAVEQ1(adult,ed)..      Aie(adult,ed) =e= (1+rrate(manu))*Kie(adult,ed);
+SAVEQ1(adult,ed)..      Assets(adult,ed) =e= (1+rrate(manu))*Kie(adult,ed);
 SAVEQ2(wa,ed)..         YLie(wa,ed) =e= We(manu,ed)*Lie(wa,ed)*(1-Wtax);
-SAVEQ3(adult,ed)..      CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Aie(adult,ed) ;
+SAVEQ3(adult,ed)..      CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Assets(adult,ed) ;
 SAVEQ4..                Con1 =e= sum(adult,sum(ed,CONie(adult,ed)));
 SAVEQ5..                GDP =e= Con1 + GovC + INV1;
 *Savings should = INV1, so this is a test equation?
