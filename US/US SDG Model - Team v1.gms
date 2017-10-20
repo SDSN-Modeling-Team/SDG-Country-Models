@@ -11,8 +11,8 @@ This section contains the set and parameter declaration in addition to the
 GDX file creation and loading.
 $offtext
 
-* Set Declaration
-*****************
+* Set and Subset Declaration
+****************************
 
 Sets     t       Time
                  tstart(t)       First Period
@@ -56,7 +56,7 @@ Alias    (s1,salias1)
          (ed,ed1);
 
 * GDX Parameter Declaration
-***********************
+***************************
 
 * The next list of parameters comes from the GDX file:
 
@@ -94,8 +94,8 @@ $LOAD  MPCw=D13 MPCa=D14 DIRREQ=D15 VADR=D16 msh=D17 INsh=D18
 $LOAD  csh=D19 Ksh=D20 YLesh=D21
 $GDXIN
 
-* Subset modification
-*********************
+* Subset Definition
+*******************
 
 tstart(t)  = yes$(ord(t) eq 1);
 tend(t)    = yes$(ord(t) eq  card(t));
@@ -118,9 +118,9 @@ meded(ed)  = yes$(ord(ed) ge 2 and ord(ed) le 4);
 hied(ed)   = yes$(ord(ed) gt 4);
 
 
-* Model Parameter Declarations
-***********************
-*The next list of parameters are produced within the model:
+* Model Parameter and Scalar Declarations
+*****************************************
+*The next list of parameters and scalars are produced within the model itself:
 
 Parameters       workage(i)              Working Age Dummies
                  oldage(i)               Old Age Dummies
@@ -163,11 +163,14 @@ Parameters       workage(i)              Working Age Dummies
                  cgov                     Per capita costs of government services
                  rho                      Elasticity parameter of substitution between robots and human labor;
 
-
-
-Lprodt(t,ed)                     = Lprod0(ed);
-Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
-
+Scalars          dep                      Depreciation Rate of Capital
+                 disc                     Discount Rate
+                 Ktot0
+                 Ktot
+                 Itot;
+                 
+*Model Parameter Definitions
+****************************
 
 ***********************
 * Population Dynamics *
@@ -179,7 +182,6 @@ workage(i)$(ord(i) gt 5 and ord(i) lt 14) = 1;
 workage(i)$(ord(i) ge 14)                 = 0;
 oldage(i)$(ord(i) le 13)                  = 0;
 oldage(i)$(ord(i) ge 14)                  = 1;
-
 
 Population("2015",i,g)    = Pop0(i,g);
 
@@ -218,6 +220,11 @@ LbyAge(t,wa,ed)          = sum(g,EducPop(t,wa,ed,g));
 
 Display EducRatio, EducPop;
 
+*Labor Productivity
+*******************
+Lprodt(t,ed)                     = Lprod0(ed);
+Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
+
 * School Population
 *******************
 
@@ -237,9 +244,6 @@ AI(s1,meded)     = 1.0;
 AIs(s,ed)        = AI(s,ed);
 AIt(t)           = 2*ord(t);
 
-Scalar   dep             Depreciation Rate of Capital
-         disc            Discount Rate;
-
 dep  = 0.05;
 disc = 1/(1+.13);
 
@@ -258,7 +262,6 @@ $offtext
 
 *Initial Conditions (2015)
 **************************
-Scalar Ktot0,Ktot,Itot;
 
 Ktot0    = 500000;
 Ktot     = 500000;
