@@ -278,7 +278,7 @@ Ps(s)            Price of production good by sector
 Wse(s,ed)         Wage by sector and education level
 MRs(s)           Rate of return of machines
 RRse(s,ed)       Rate of return of robots by type of robot (educ levels)
-IRse(s,ed)       Average rate of return for capital
+IRse(s)          Average rate of return for capital
 GDP              Gross Domestic Product
 GNP              Gross National Product
 YLie(i,ed)       Net Labor Income by educ level and generation (after tax)
@@ -323,7 +323,7 @@ PRICEQ2(s)               Price of non-market goods
 FACTEQ1(s,ed)            Wage by sector and education level
 FACTEQ2(s)               Rate of Return on Machines
 FACTEQ3(s,ed)            Rate of Return on Robots
-FACTEQ4(s,ed)            Average Rate of Return
+FACTEQ4(s)               Average Rate of Return
 
 NATEQ1                   Calculation of GDP by summing sectors
 NATEQ2(i,ed)             Capital income by generation and education level
@@ -366,7 +366,7 @@ MARKEQ3(ed)..           sum(s1,Lse(s1,ed)) =e= Letot(ed);
 FACTEQ1(s1,ed)..        Wse(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 FACTEQ2(s1)..           MRs(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
 FACTEQ3(s1,ed)..        RRse(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
-FACTEQ4(s1,ed)..        IRse(s1,ed) =e= (MRs(s1) * sum(s1,(Ms(s1))) + RRse(s1,ed) * sum(s1,sum(ed,(Rse(s1,ed)))) / sum(s1,(Ms(s1) + sum(ed,(Rse(s1,ed)))));
+FACTEQ4(s1)..           IRse(s1) =e= (MRs(s1)*Ms(s1) + sum(ed,RRse(s1,ed)*Rse(s1,ed))) / (Ms(s1) + sum(ed,(Rse(s1,ed))));
 
 *Investment / Savings Sector [Financial Markets]
 INVEQ1..                INV =e= Itot*PI;
