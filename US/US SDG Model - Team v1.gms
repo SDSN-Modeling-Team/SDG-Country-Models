@@ -100,8 +100,8 @@ meded(ed)  = yes$(ord(ed) ge 2 and ord(ed) le 4);
 hied(ed)   = yes$(ord(ed) gt 4);
 
 
-* Model Parameter and Scalar Declarations
-*****************************************
+* Model Parameter Declarations and Definitions
+**********************************************
 *The next list of parameters and scalars are produced within the model itself:
 
 Parameters       Population(t,i,g)       Population by gender and generation at time t
@@ -148,9 +148,6 @@ Scalars          dep                     Depreciation Rate of Capital
                  Ktot0                   Initial capital Stock
                  Ktot                    Total capital Stock
                  Itot;
-
-*Model Parameter Definitions
-****************************
 
 ***********************
 * Population Dynamics *
