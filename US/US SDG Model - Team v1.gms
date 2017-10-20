@@ -26,26 +26,16 @@ Sets     t                       Time
          occ                     Occupations
          s                       Sectors
                  s1(s)           all but self and total
-                 s2(s)           all be self total and man
+$ontext
+Why have an exogenous "sector" called total if we can just calculate it within the model?  
+Why have a sector called "self-employment"? 
+If we got rid of these, we would be able to run equations just by calling the full set of sectors, instead of calling subsets.
+$offtext
                  mar(s)          market sectors (all but EDUC HL GOV SLF TOT)
                  nmar(s)         non-market sectors (EDUC HL GOV SLF TOT)
-                 gv(s)           government
-                 pr(s)           private
-                 tr(s)           traded
-                 ntr(s)          non-traded
-                 fd(s)           food
-                 mg(s)           mining
-                 el(s)           electricity
-                 edu(s)          education
-                 he(s)           health
-                 opr(s)          other private sector
-                 snm(s)          all sectors but manufacturing
-                 ex(s)           extractive sectors (ag and min)
-                 cons(s)         construction
-                 manu(s)         manufacturing
-                 nman(s)         non-manufacturing market sectors
-                 cpr(s)          private consumption
-                 ns(s)           inputs for s
+                 tr(s)           internationally tradable
+                 ntr(s)          not internationally tradable
+                 manu(s)         manufacturing sector (used as numeraire for prices)
          iter                    Iteration
          ed                      Education
                  lowed(ed)       Lower Education
@@ -107,10 +97,7 @@ old(i)     = yes$((ord(i) ge 14) and (ord(i) le 17));
 
 s1(s)      = yes$(ord(s) lt 19);
 mar(s)     = yes$(ord(s) lt 13 or (ord(s) ge 15 and ord(s) lt 18));
-nmar(s)    = yes$((ord(s) eq 13) or (ord(s) eq 14) or (ord(s) eq 18));
-s2(s)      = yes$(ord(s) lt 19 and (ord(s) ne 5));
-nman(s)    = yes$((ord(s) lt 19) and (ord(s) ne 5) and ((ord(s) ne 13)
-             and (ord(s) ne 14) and (ord(s) ne 18)));
+nmar(s)    = yes$((ord(s) eq 13) or (ord(s) eq 14) or (ord(s) eq 18))
 manu(s)    = yes$(ord(s) eq 5);
 
 lowed(ed)  = yes$(ord(ed) le 1);
@@ -392,8 +379,8 @@ KNext..                 KN =e= (1-dep)*Ktot + Itot;
 
 *Savings
 *rrate is incorrect; should be total return or weighted return between machines, robots
-AssetY(adult,ed)..      Aie(adult,ed) =e= (1+rrate("MAN"))*Kie(adult,ed);
-LabY(wa,ed)..           YLie(wa,ed) =e= We("MAN",ed)*Lie(wa,ed)*(1-Wtax);
+AssetY(adult,ed)..      Aie(adult,ed) =e= (1+rrate(manu))*Kie(adult,ed);
+LabY(wa,ed)..           YLie(wa,ed) =e= We(manu,ed)*Lie(wa,ed)*(1-Wtax);
 Consume(adult,ed)..     CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Aie(adult,ed) ;
 CONtotal..              Con1 =e= sum(adult,sum(ed,CONie(adult,ed)));
 AGDemand..              GDP =e= Con1 + GovC + INV1;
@@ -401,22 +388,22 @@ AGDemand..              GDP =e= Con1 + GovC + INV1;
 PrivSav..               Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)));
 
 *Prices
-Numeraire("MAN")..      Ps("MAN") =e= 1;
+Numeraire(manu)..      Ps(manu) =e= 1;
 *rrate is incorrect; should be total return or weighted return between machines, robots
-Price(nmar)..           Ps(nmar)*Qs(nmar) =e= sum(ed,We("MAN",ed)*Lse(nmar,ed))+rrate("MAN")*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
+Price(nmar)..           Ps(nmar)*Qs(nmar) =e= sum(ed,We(manu,ed)*Lse(nmar,ed))+rrate(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
 
 *National Accounts
 NationalOutput..        GDP =e= sum(s1,Ps(s1)*Qs(s1));
 *rrate is incorrect; should be total return or weighted return between machines, robots
-CapY(adult,ed)..        YKie(adult,ed) =e= rrate("MAN")*Kie(adult,ed);
-LaborIncome..           YL =e= sum(ed,We("MAN",ed)*Letot(ed));
+CapY(adult,ed)..        YKie(adult,ed) =e= rrate(manu)*Kie(adult,ed);
+LaborIncome..           YL =e= sum(ed,We(manu,ed)*Letot(ed));
 *rrate is incorrect; should be total return or weighted return between machines, robots
-CapitalIncome..         YK =e= rrate("MAN")*Ktot;
+CapitalIncome..         YK =e= rrate(manu)*Ktot;
 NationalIncome..        GNP =e= YL + YK;
 *Irrelevant variable
 PrivCon..               Con =e= sum(mar,Ps(mar)*Cs(mar));
 *Product of first order condition of utility problem
-SECDemand(mar)..        Cs(mar) =e= Csh(mar)*Cs("MAN")/(Csh("MAN")*Ps(mar));
+SECDemand(mar)..        Cs(mar) =e= Csh(mar)*Cs(manu)/(Csh(manu)*Ps(mar));
 
 *Government
 GovEduc("Educ")..       Cs("Educ") =e= cps*(PSchool0+cls*LSSchool0+cus*USSchool0+clt*LTSchool0+cut*UTSchool0);
@@ -468,11 +455,11 @@ Loop(time,
     Solve USOLG maximizing Util using dnlp;
     Itot                 = INV1.L/PI.L;
   );
-  Wedt(time,ed)          = We.L("MAN",ed);
+  Wedt(time,ed)          = We.L(manu,ed);
   AIs(s1,ed)             = AI(s1,ed)* AIt(time);
   Lset(time,s1,ed)       = Lse.L(s1,ed);
   EFFLt(time,s1)         = EFFL.L(s1);
-  rt(time)               = rrate.L("MAN");
+  rt(time)               = rrate.L(manu);
   Kt(time)               = Ktot;
   Kttest(time)           = sum(i,sum(ed,Kie(i,ed)));
   Ktie(time,i,ed)        = Kie(i,ed);
