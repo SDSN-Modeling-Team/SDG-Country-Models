@@ -133,26 +133,45 @@ oldage(i)$(ord(i) ge 14)                  = 1;
 Lprodt(t,ed)                     = Lprod0(ed);
 Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
 
+* Parameter Declarations
+***********************
 
-
-
+Parameters       Population(t,i,g)       Population by gender and generation at time t
+                 Births(t,g)             Total Births by gender at time t
+                 Populationtotal(t)      Total Population at time t
+                 Pop(t,g)                Total population by gender at time t
+                 Poptotal                Population Total updated each loop of t
+                 EducPop(t,i,ed,g)       Population in each Educ Level
+                 EducRatio(t,i,ed,g)     % of Population at each Educ Level
+                 Ltot(t,ed)              Labor Force by Education Level
+                 LbyAge(t,i,ed)          Labor Force by Educ Level and Generation
+                 PSchoolt(t)             Primary School Population
+                 LSSchoolt(t)            Lower Secondary Population
+                 USSchoolt(t)            Upper Secondary Population
+                 LTSchoolt(t)            Lower Tertiary Population
+                 UTSchoolt(t)            Upper Tertiary Population
+                 PSchool0                PS Initial Value
+                 LSSchool0               LS Initial Value
+                 USSchool0               US Initial Value
+                 LTSchool0               LT Initial Value
+                 UTSchool0               UT Initial Value
+                 Letot(ed)      Initial Working Age Population at each Education Level
+                 Letotal(t,ed)  Letot in each time period
+                 Ltie(t,i,ed)   WA Pop at each educ and generation in each time period
+                 Lie(i,ed)      Initial Value for Ltie
+                 MPCWe(i)       Alternative MPC from wage
+                 MPCAs(i)       Alternative MPC from asset
+                 AI(s,ed)        Initial Condition for AI
+                 AIs(s,ed)
+                 AIt(t)
+                 Kie(i,ed)
+                 cps,cls,cus,clt,cut,chl,cgov Per capita costs of government services
+                 rho Elasticity parameter of substitution between robots and human labor;
 
 
 ***********************
 * Population Dynamics *
 ***********************
-
-* Parameter Declaration
-***********************
-
-Parameter        Population(t,i,g)       Population by gender and generation at time t
-                 Births(t,g)             Total Births by gender at time t
-                 Populationtotal(t)      Total Population at time t
-                 Pop(t,g)                Total population by gender at time t
-                 Poptotal                Population Total updated each loop of t;
-
-* Dynamics
-**********
 
 Population("2015",i,g)    = Pop0(i,g);
 
@@ -171,17 +190,6 @@ Display Population, Births, Populationtotal;
 **********************
 * Education Dynamics *
 **********************
-
-* Parameter Declaration
-***********************
-
-Parameter        EducPop(t,i,ed,g)    Population in each Educ Level
-                 EducRatio(t,i,ed,g)  % of Population at each Educ Level
-                 Ltot(t,ed)           Labor Force by Education Level
-                 LbyAge(t,i,ed)       Labor Force by Educ Level and Generation;
-* Dynamics
-**********
-
 EducPop("2015",i,ed,g)        = Educ0(i,g,ed);
 EducRatio("2015",wa,ed,g)     = EducPop("2015",wa,ed,g)/sum(ed1,EducPop("2015",wa,ed1,g));
 
@@ -205,17 +213,6 @@ Display EducRatio, EducPop;
 * School Population
 *******************
 
-Parameter        PSchoolt(t)    Primary School Population
-                 LSSchoolt(t)   Lower Secondary Population
-                 USSchoolt(t)   Upper Secondary Population
-                 LTSchoolt(t)   Lower Tertiary Population
-                 UTSchoolt(t)   Upper Tertiary Population
-                 PSchool0        PS Initial Value
-                 LSSchool0       LS Initial Value
-                 USSchool0       US Initial Value
-                 LTSchool0       LT Initial Value
-                 UTSchool0       UT Initial Value;
-
 PSchoolt(t)  = sum(g,Population(t,"5-9",g));
 LSSchoolt(t) = sum(g,Population(t,"10-14",g));
 USSchoolt(t) = sum(g,Population(t,"15-19",g));
@@ -225,19 +222,6 @@ UTSchoolt(t) = sum(g,Population(t,"25-29",g))*.20;
 ***********************
 * Core Economic Model *
 ***********************
-
-* Parameter and Scalar Declaration
-**********************************
-
-parameter        Letot(ed)      Initial Working Age Population at each Education Level
-                 Letotal(t,ed)  Letot in each time period
-                 Ltie(t,i,ed)   WA Pop at each educ and generation in each time period
-                 Lie(i,ed)      Initial Value for Ltie
-                 MPCWe(i)       Alternative MPC from wage
-                 MPCAs(i)       Alternative MPC from asset
-                 AI(s,ed)        Initial Condition for AI
-                 AIs(s,ed)
-                 AIt(t);
 
 AI(s1,ed)        = 0;
 AI(s1,lowed)     = 0.5;
@@ -272,7 +256,6 @@ Ktot0    = 500000;
 Ktot     = 500000;
 Itot     = 747009;
 
-Parameter Kie(i,ed);
 
 Ksh("85-89")     = 0;
 Kie(i,ed)        = Ktot*Ksh(i)*YLesh(ed);
@@ -330,8 +313,6 @@ Util             Utility Function;
 *Cost Structures
 ****************
 
-Parameters cps,cls,cus,clt,cut,chl,cgov Per capita costs of government services;
-
 cps  = .05;
 cls  = .05;
 cus  = .05;
@@ -340,9 +321,9 @@ cut  = .05;
 chl  = .05;
 cgov = .05;
 
-Parameter rho Elasticity parameter of substitution between robots and human labor;
+Parameter ;
 
-rho =-0.5;
+rho = -0.5;
 
 *Model Equation
 ***************
