@@ -278,7 +278,7 @@ Rse(s,ed)        Robots demand by sector and education
 Rob              Total robot demand
 Mac              Total machine demand
 Ps(s)            Price of production good by sector
-We(s,ed)         Wage by sector and education level
+Wse(s,ed)         Wage by sector and education level
 MRs(s)           Rate of return of machines
 RRse(s,ed)       Rate of return of robots by type of robot (educ levels)
 IRse(s,ed)       Average rate of return for capital
@@ -366,7 +366,7 @@ MARKEQ2..               KTOT =e= sum(ed,sum(s1,Rse(s1,ed))) + sum(s1,Ms(s1));
 MARKEQ3(ed)..           sum(s1,Lse(s1,ed)) =e= Letot(ed);
 
 *Factor Markets
-FACTEQ1(s1,ed)..        We(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
+FACTEQ1(s1,ed)..        Wse(s1,ed) =e= (Lprod0(ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 FACTEQ2(s1)..           MRs(s1) =e= msh(s1)*Ps(s1)*Qs(s1)/Ms(s1);
 FACTEQ3(s1,ed)..        RRse(s1,ed) =e= (AIs(s1,ed)*(1-msh(s1))*Ps(s1)*Qs(s1)/EFFL(s1)) * (EFFL(s1)/(Lprod0(ed)*Lse(s1,ed)+AIs(s1,ed)*Rse(s1,ed)))**(rho+1);
 FACTEQ4(s1,ed)          IRse(s1,ed) =e= (MRs(s1) * sum(s1,(Ms(s1))) + RRse(s1,ed) * sum(s1,sum(ed,(Rse(s1,ed)))) / sum(s1,(Ms(s1) + sum(ed,(Rse(s1,ed)))));
@@ -383,7 +383,7 @@ INVEQ4..                KN =e= (1-dep)*Ktot + Itot;
 
 *Savings
 SAVEQ1(adult,ed)..      Aie(adult,ed) =e= (1+IRse(manu))*Kie(adult,ed);
-SAVEQ2(wa,ed)..         YLie(wa,ed) =e= We(manu,ed)*Lie(wa,ed)*(1-Wtax);
+SAVEQ2(wa,ed)..         YLie(wa,ed) =e= Wse(manu,ed)*Lie(wa,ed)*(1-Wtax);
 SAVEQ3(adult,ed)..      CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Aie(adult,ed) ;
 SAVEQ4..                Con1 =e= sum(adult,sum(ed,CONie(adult,ed)));
 SAVEQ5..                GDP =e= Con1 + GovC + INV1;
@@ -392,13 +392,13 @@ SAVEQ6..                Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)))
 
 *Prices
 PRICEQ1(manu)..          Ps(manu) =e= 1;
-PRICEQ2(nmar)..          Ps(nmar)*Qs(nmar) =e= sum(ed,We(manu,ed)*Lse(nmar,ed))+IRse(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
+PRICEQ2(nmar)..          Ps(nmar)*Qs(nmar) =e= sum(ed,Wse(manu,ed)*Lse(nmar,ed))+IRse(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
 
 *National Accounts
 NATEQ1..                GDP =e= sum(s1,Ps(s1)*Qs(s1));
 *rrate is incorrect; should be total return or weighted return between machines, robots
 NATEQ2(adult,ed)..      YKie(adult,ed) =e= rrate(manu)*Kie(adult,ed);
-NATEQ3..                YL =e= sum(ed,We(manu,ed)*Letot(ed));
+NATEQ3..                YL =e= sum(ed,Wse(manu,ed)*Letot(ed));
 *rrate is incorrect; should be total return or weighted return between machines, robots
 NATEQ4..                YK =e= IRse(manu)*Ktot;
 NATEQ5..                GNP =e= YL + YK;
@@ -433,7 +433,7 @@ Ms.lo(s)         = .0001;
 Cs.lo(s)         = .0001;
 Rse.lo(s,ed)     = .00001;
 Ps.lo(s)         = .0001;
-We.lo(s,ed)      = .0001;
+Wse.lo(s,ed)      = .0001;
 rrate.lo(s)      = .0001;
 Qs.lo(s)         = .0001;
 KN.lo            = .0001;
@@ -457,7 +457,7 @@ Loop(time,
     Solve USOLG maximizing Util using dnlp;
     Itot                 = INV1.L/PI.L;
   );
-  Wedt(time,ed)          = We.L(manu,ed);
+  Wedt(time,ed)          = Wse.L(manu,ed);
   AIs(s1,ed)             = AI(s1,ed)* AIt(time);
   Lset(time,s1,ed)       = Lse.L(s1,ed);
   EFFLt(time,s1)         = EFFL.L(s1);
