@@ -14,17 +14,17 @@ $offtext
 * Set and Subset Declaration
 ****************************
 
-Sets     t       Time
+Sets     t                       Time
                  tstart(t)       First Period
                  tend(t)         Last Period
                  time(t)         Test Periods
-         g       Gender
-         i       Generation
+         g                       Gender
+         i                       Generation
                  wa(i)           Working Age
                  old(i)          Old Age
                  adult(i)        Adult Age
-         occ     Occupations
-         s       Sectors
+         occ                     Occupations
+         s                       Sectors
                  s1(s)           all but self and total
                  s2(s)           all be self total and man
                  mar(s)          market sectors (all but EDUC HL GOV SLF TOT)
@@ -46,8 +46,8 @@ Sets     t       Time
                  nman(s)         non-manufacturing market sectors
                  cpr(s)          private consumption
                  ns(s)           inputs for s
-         iter    Iteration
-         ed      Education
+         iter                    Iteration
+         ed                      Education
                  lowed(ed)       Lower Education
                  meded(ed)       Medium Education
                  hied(ed)        High Education;
@@ -122,10 +122,7 @@ hied(ed)   = yes$(ord(ed) gt 4);
 *****************************************
 *The next list of parameters and scalars are produced within the model itself:
 
-Parameters       workage(i)              Working Age Dummies
-                 oldage(i)               Old Age Dummies
-                 Lprodt(t,ed)            Lprod Time Based
-                 Population(t,i,g)       Population by gender and generation at time t
+Parameters       Population(t,i,g)       Population by gender and generation at time t
                  Births(t,g)             Total Births by gender at time t
                  Populationtotal(t)      Total Population at time t
                  Pop(t,g)                Total population by gender at time t
@@ -134,11 +131,12 @@ Parameters       workage(i)              Working Age Dummies
                  EducRatio(t,i,ed,g)     % of Population at each Educ Level
                  Ltot(t,ed)              Labor Force by Education Level
                  LbyAge(t,i,ed)          Labor Force by Educ Level and Generation
-                 PSchoolt(t)             Primary School Population
-                 LSSchoolt(t)            Lower Secondary Population
-                 USSchoolt(t)            Upper Secondary Population
-                 LTSchoolt(t)            Lower Tertiary Population
-                 UTSchoolt(t)            Upper Tertiary Population
+                 Lprodt(t,ed)            Lprod Time Based
+                 PSchoolt(t)             Primary School Population at time t
+                 LSSchoolt(t)            Lower Secondary Population at time t
+                 USSchoolt(t)            Upper Secondary Population at time t
+                 LTSchoolt(t)            Lower Tertiary Population at time t
+                 UTSchoolt(t)            Upper Tertiary Population at time t
                  PSchool0                PS Initial Value
                  LSSchool0               LS Initial Value
                  USSchool0               US Initial Value
@@ -154,19 +152,19 @@ Parameters       workage(i)              Working Age Dummies
                  AIs(s,ed)
                  AIt(t)
                  Kie(i,ed)
-                 cps                      Per Capita costs of education services
-                 cls
-                 cus
-                 clt
-                 cut                      Per capita costs of 
-                 chl                      Per capita costs of health services
-                 cgov                     Per capita costs of government services
+                 cps                      Per Capita cost of primary education services
+                 cls                      Per Capita cost of lower secondary education services
+                 cus                      Per Capita cost of upper secondary education services
+                 clt                      Per Capita cost of lower tertiary education services
+                 cut                      Per capita cost of upper tertiary education services
+                 chl                      Per capita cost of health services
+                 cgov                     Per capita cost of government services
                  rho                      Elasticity parameter of substitution between robots and human labor;
 
 Scalars          dep                      Depreciation Rate of Capital
                  disc                     Discount Rate
-                 Ktot0
-                 Ktot
+                 Ktot0                    Initial capital Stock
+                 Ktot                     Total capital Stock
                  Itot;
                  
 *Model Parameter Definitions
@@ -175,13 +173,6 @@ Scalars          dep                      Depreciation Rate of Capital
 ***********************
 * Population Dynamics *
 ***********************
-
-*Age group definition 
-workage(i)$(ord(i) le 5)                  = 0;
-workage(i)$(ord(i) gt 5 and ord(i) lt 14) = 1;
-workage(i)$(ord(i) ge 14)                 = 0;
-oldage(i)$(ord(i) le 13)                  = 0;
-oldage(i)$(ord(i) ge 14)                  = 1;
 
 Population("2015",i,g)    = Pop0(i,g);
 
@@ -195,11 +186,10 @@ Populationtotal(t)       = sum(i,sum(g,Population(t,i,g)));
 Pop(t,g)                 = sum(i,Population(t,i,g));
 Poptotal                 = sum(g,Pop("2015",g));
 
-Display Population, Births, Populationtotal;
-
 **********************
 * Education Dynamics *
 **********************
+
 EducPop("2015",i,ed,g)        = Educ0(i,g,ed);
 EducRatio("2015",wa,ed,g)     = EducPop("2015",wa,ed,g)/sum(ed1,EducPop("2015",wa,ed1,g));
 
@@ -218,11 +208,8 @@ EducPop(t,i,ed,g)        = EducRatio(t,i,ed,g)*Population(t,i,g);
 Ltot(t,ed)               = sum(g,sum(wa,EducPop(t,wa,ed,g)));
 LbyAge(t,wa,ed)          = sum(g,EducPop(t,wa,ed,g));
 
-Display EducRatio, EducPop;
-
 *Labor Productivity
 *******************
-Lprodt(t,ed)                     = Lprod0(ed);
 Lprodt(t,ed)$(ord(ed) ge 5)      = Lprodt(t,ed)*(1+.10)**(ord(t)-1);
 
 * School Population
@@ -237,15 +224,15 @@ UTSchoolt(t) = sum(g,Population(t,"25-29",g))*.20;
 ***********************
 * Core Economic Model *
 ***********************
+rho = -0.5;
+dep  = 0.05;
+disc = 1/(1+.13);
 
 AI(s1,ed)        = 0;
 AI(s1,lowed)     = 0.5;
 AI(s1,meded)     = 1.0;
 AIs(s,ed)        = AI(s,ed);
 AIt(t)           = 2*ord(t);
-
-dep  = 0.05;
-disc = 1/(1+.13);
 
 Letotal(t,ed) = sum(wa,sum(g,EducPop(t,wa,ed,g)));
 Ltie(t,wa,ed) = sum(g, EducPop(t,wa,ed,g));
@@ -272,6 +259,7 @@ Ksh("85-89")     = 0;
 Kie(i,ed)        = Ktot*Ksh(i)*YLesh(ed);
 Letot(ed)        = Letotal("2015",ed);
 Lie(wa,ed)       = sum(g,EducPop("2015",wa,ed,g));
+Lprodt(t,ed)     = Lprod0(ed);
 PSchool0         = PSchoolt("2015");
 LSSchool0        = LSSchoolt("2015");
 USSchool0        = USSchoolt("2015");
@@ -331,9 +319,6 @@ clt  = .05;
 cut  = .05;
 chl  = .05;
 cgov = .05;
-
-
-rho = -0.5;
 
 *Model Equations
 ****************
@@ -512,6 +497,6 @@ Loop(time,
   Ktot                   = KN.L;
 );
 
-display  Cont, Con1t, Mact, Robt, INVt, INV1t, GovCt, Cont, GDPt, GovCt, Txt,
-         GNPt,GDPt, Kt, Rset, Mst, Kt, Kttest,KN.L, KNtest.L,Con.L, Con1.L,
-         INV.L, INV1.L, Sav.L, Wedt;
+Display   Population, Births, Populationtotal, EducRatio, EducPop, Cont, Con1t, Mact, Robt, INVt, INV1t, GovCt, Cont, GDPt, GovCt, Txt,
+          GNPt,GDPt, Kt, Rset, Mst, Kt, Kttest,KN.L, KNtest.L,Con.L, Con1.L,
+          INV.L, INV1.L, Sav.L, Wedt;
