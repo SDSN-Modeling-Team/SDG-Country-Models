@@ -272,8 +272,6 @@ Lse(s,ed)        Labor demand by educ level and sector
 EFFL(s)          Effective Labor
 Ms(s)            Machine demand by sector
 Rse(s,ed)        Robots demand by sector and education
-Rob              Total robot demand
-Mac              Total machine demand
 Ps(s)            Price of production good by sector
 Wse(s,ed)         Wage by sector and education level
 MRs(s)           Rate of return of machines
@@ -379,8 +377,8 @@ INVEQ4..                KN =e= (1-dep)*Ktot + Itot;
 *including INV/PI  instead of Itot.
 
 *Savings
-SAVEQ1(adult,ed)..      Aie(adult,ed) =e= (1+IRse(manu))*Kie(adult,ed);
-SAVEQ2(wa,ed)..         YLie(wa,ed) =e= Wse(manu,ed)*Lie(wa,ed)*(1-Wtax);
+SAVEQ1(adult,ed)..      Aie(adult,ed) =e= (1+IRse("MAN"))*Kie(adult,ed);
+SAVEQ2(wa,ed)..         YLie(wa,ed) =e= Wse("MAN",ed)*Lie(wa,ed)*(1-Wtax);
 SAVEQ3(adult,ed)..      CONie(adult,ed) =e= MPCWe(adult)*(YLie(adult,ed)) + MPCAs(adult)*Aie(adult,ed) ;
 SAVEQ4..                Con1 =e= sum(adult,sum(ed,CONie(adult,ed)));
 SAVEQ5..                GDP =e= Con1 + GovC + INV1;
@@ -388,21 +386,21 @@ SAVEQ5..                GDP =e= Con1 + GovC + INV1;
 SAVEQ6..                Sav =e= sum(i,sum(ed,YLie(i,ed)+YKie(i,ed)-CONie(i,ed)));
 
 *Prices
-PRICEQ1(manu)..          Ps(manu) =e= 1;
-PRICEQ2(nmar)..          Ps(nmar)*Qs(nmar) =e= sum(ed,Wse(manu,ed)*Lse(nmar,ed))+IRse(manu)*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
+PRICEQ1("MAN")..          Ps("MAN") =e= 1;
+PRICEQ2(nmar)..          Ps(nmar)*Qs(nmar) =e= sum(ed,Wse("MAN",ed)*Lse(nmar,ed))+IRse("MAN")*(Ms(nmar)+sum(ed,Rse(nmar,ed)));
 
 *National Accounts
 NATEQ1..                GDP =e= sum(s1,Ps(s1)*Qs(s1));
 *rrate is incorrect; should be total return or weighted return between machines, robots
-NATEQ2(adult,ed)..      YKie(adult,ed) =e= rrate(manu)*Kie(adult,ed);
-NATEQ3..                YL =e= sum(ed,Wse(manu,ed)*Letot(ed));
+NATEQ2(adult,ed)..      YKie(adult,ed) =e= rrate("MAN")*Kie(adult,ed);
+NATEQ3..                YL =e= sum(ed,Wse("MAN",ed)*Letot(ed));
 *rrate is incorrect; should be total return or weighted return between machines, robots
-NATEQ4..                YK =e= IRse(manu)*Ktot;
+NATEQ4..                YK =e= IRse("MAN")*Ktot;
 NATEQ5..                GNP =e= YL + YK;
 *Irrelevant variable
 NATEQ6..                Con =e= sum(mar,Ps(mar)*Cs(mar));
 *Product of first order condition of utility problem
-NATEQ7(mar)..           Cs(mar) =e= Csh(mar)*Cs(manu)/(Csh(manu)*Ps(mar));
+NATEQ7(mar)..           Cs(mar) =e= Csh(mar)*Cs("MAN")/(Csh("MAN")*Ps(mar));
 
 *Government
 GOVEQ1("Educ")..        Cs("Educ") =e= cps*(PSchool0+cls*LSSchool0+cus*USSchool0+clt*LTSchool0+cut*UTSchool0);
@@ -454,11 +452,11 @@ Loop(time,
     Solve USOLG maximizing Util using dnlp;
     Itot                 = INV1.L/PI.L;
   );
-  Wedt(time,ed)          = Wse.L(manu,ed);
+  Wedt(time,ed)          = Wse.L("MAN",ed);
   AIs(s1,ed)             = AI(s1,ed)* AIt(time);
   Lset(time,s1,ed)       = Lse.L(s1,ed);
   EFFLt(time,s1)         = EFFL.L(s1);
-  rt(time)               = rrate.L(manu);
+  rt(time)               = rrate.L("MAN");
   Kt(time)               = Ktot;
   Kttest(time)           = sum(i,sum(ed,Kie(i,ed)));
   Ktie(time,i,ed)        = Kie(i,ed);
@@ -475,11 +473,9 @@ Loop(time,
   Con1t(time)            = Con1.L;
   Rset(time,s1,ed)       = Rse.L(s1,ed);
   Mst(time,s1)           = Ms.L(s1);
-  Mact(time)             = Mac.L;
-  Robt(time)             = Rob.L;
   Ktot                   = KN.L;
 );
 
-Display   Population, Births, Populationtotal, EducRatio, EducPop, Cont, Con1t, Mact, Robt, INVt, INV1t, GovCt, Cont, GDPt, GovCt, Txt,
+Display   Population, Births, Populationtotal, EducRatio, EducPop, Cont, Con1t, INVt, INV1t, GovCt, Cont, GDPt, GovCt, Txt,
           GNPt,GDPt, Kt, Rset, Mst, Kt, Kttest,KN.L, KNtest.L,Con.L, Con1.L,
           INV.L, INV1.L, Sav.L, Wedt;
